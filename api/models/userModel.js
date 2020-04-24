@@ -26,6 +26,11 @@ var UserSchema = new Schema({
         required: true
     },
     image: String,
+    gender: {
+        type: String,
+        enum: ['male','female'],
+        required: true
+    },
     isEmployer: {
         type: Boolean,
         required: true
