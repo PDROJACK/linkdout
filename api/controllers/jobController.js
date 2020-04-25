@@ -1,6 +1,8 @@
 var User = require('../models/userModel');
 var _ = require('lodash');
 const Job = require('../models/jobsModel');
+const Application = require('../models/applicationModel');
+
 const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 
 const getJob = async function(req,res,next){
@@ -23,17 +25,17 @@ const getJob = async function(req,res,next){
 
 const createJob = async function(req,res,next) {
     try {
-        const employerId = req.body.employer;
+        const employerId = req.me._id;
         const user = await User.findById({_id:employerId});
-        
+
         if(!user || user.isEmployer === false){
             return res.status(401).json({
                 message : 'Only employer can create jobs'
             });
         }
         
-        let job = new Job(_.pick(req.body,['title', 'employer', 'numberOfPeople', 'description']))
-        
+        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description']))
+        job.employer = employerId;
         if(req.body.location){
             job.location = req.body.location
         }
@@ -60,9 +62,7 @@ const createJob = async function(req,res,next) {
             });
         }));
         
-        res.status(200).json({
-            message: "Job created"
-        })
+        res.status(200).json({_id: job._id})
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -108,6 +108,13 @@ const applyJob = async function(req,res,next){
                 employees: userId
             }
         });
+        
+        const application = new Application({
+            job: jobId,
+            employee: userId         
+        });
+
+        await application.save();
 
         res.status(200).send({
             message: "Successfully applied for job"
