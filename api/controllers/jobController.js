@@ -6,7 +6,7 @@ const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await Job.findById(jobId).select('title location description');
+        const job = await Job.findById(jobId).select('title location description employer employees');
 
         if(!job){
             return res.status(400).json({
@@ -16,6 +16,7 @@ const getJob = async function(req,res,next){
 
         res.status(200).send(job);
     } catch (error) {
+        console.log(error);
         res.status(500).json(error);
     }
 };
@@ -36,7 +37,6 @@ const createJob = async function(req,res,next) {
         if(req.body.location){
             job.location = req.body.location
         }
-
 
         if(req.files){
             let images=[]
