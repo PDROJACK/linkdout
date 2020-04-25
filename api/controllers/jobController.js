@@ -9,14 +9,20 @@ const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
         const job = await Job.findById(jobId).select('title location description employer employees budget');
+        const application = await Application.find({job:jobId});
 
         if(!job){
             return res.status(400).json({
                 message: 'Job not found'
             });
         }
+        
+        const jobInfo = {
+            job: job,
+            applicants: application
+        }
 
-        res.status(200).send(job);
+        res.status(200).send(jobInfo);
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -117,7 +123,7 @@ const applyJob = async function(req,res,next){
         if(req.body.comment){
             application.comment = comment
         }
-        
+
         await application.save();
 
         res.status(200).send({
