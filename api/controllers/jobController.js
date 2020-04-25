@@ -8,7 +8,7 @@ const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await Job.findById(jobId).select('title location description employer employees');
+        const job = await Job.findById(jobId).select('title location description employer employees budget');
 
         if(!job){
             return res.status(400).json({
@@ -34,7 +34,7 @@ const createJob = async function(req,res,next) {
             });
         }
         
-        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description']))
+        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description', 'budget']))
         job.employer = employerId;
         if(req.body.location){
             job.location = req.body.location
@@ -108,18 +108,23 @@ const applyJob = async function(req,res,next){
                 employees: userId
             }
         });
-        
+
         const application = new Application({
             job: jobId,
             employee: userId         
         });
-
+        
+        if(req.body.comment){
+            application.comment = comment
+        }
+        
         await application.save();
 
         res.status(200).send({
             message: "Successfully applied for job"
         });
     } catch (error) {
+        console.log(error);
         res.status(500).send(error);
     }
 }

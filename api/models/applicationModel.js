@@ -19,6 +19,9 @@ const ApplicationSchema = new Schema({
         type: String,
         enum: ['accepted','rejected','pending'],
         default: 'pending'
+    },
+    comment: {
+        type: String
     }
 },{timestamps: true});
 
