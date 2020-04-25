@@ -39,6 +39,10 @@ var JobSchema = new Schema({
     images: {
         type: [String],
         default: []
+    },
+    budget: {
+        type: Number,
+        required: true
     }
 },{ timestamps: true });
 

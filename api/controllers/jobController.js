@@ -1,12 +1,14 @@
 var User = require('../models/userModel');
 var _ = require('lodash');
 const Job = require('../models/jobsModel');
+const Application = require('../models/applicationModel');
+
 const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await (await Job.findById(jobId).select('title location description requirment numberOfPeople employees')).populate('employees');
+        const job = await Job.findById(jobId).select('title location description employer employees budget');
 
         if(!job){
             return res.status(400).json({
@@ -16,6 +18,7 @@ const getJob = async function(req,res,next){
 
         res.status(200).send(job);
     } catch (error) {
+        console.log(error);
         res.status(500).json(error);
     }
 };
@@ -31,12 +34,11 @@ const createJob = async function(req,res,next) {
             });
         }
         
-        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description']))
+        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description', 'budget']))
         job.employer = employerId;
         if(req.body.location){
             job.location = req.body.location
         }
-
 
         if(req.files){
             let images=[]
@@ -107,10 +109,22 @@ const applyJob = async function(req,res,next){
             }
         });
 
+        const application = new Application({
+            job: jobId,
+            employee: userId         
+        });
+        
+        if(req.body.comment){
+            application.comment = comment
+        }
+        
+        await application.save();
+
         res.status(200).send({
             message: "Successfully applied for job"
         });
     } catch (error) {
+        console.log(error);
         res.status(500).send(error);
     }
 }
