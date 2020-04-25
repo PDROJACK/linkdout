@@ -8,7 +8,7 @@ const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await Job.findById(jobId).select('title location description employer employees budget');
+        const job = await Job.findById(jobId).select('title location numberOfPeople description employer employees budget');
 
         if(!job){
             return res.status(400).json({
