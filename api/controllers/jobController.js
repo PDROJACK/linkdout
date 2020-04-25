@@ -6,7 +6,7 @@ const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await Job.findById(jobId).select('title location description');
+        const job = await (await Job.findById(jobId).select('title location description requirment numberOfPeople employees')).populate('employees');
 
         if(!job){
             return res.status(400).json({
@@ -22,17 +22,17 @@ const getJob = async function(req,res,next){
 
 const createJob = async function(req,res,next) {
     try {
-        const employerId = req.body.employer;
+        const employerId = req.me._id;
         const user = await User.findById({_id:employerId});
-        
+
         if(!user || user.isEmployer === false){
             return res.status(401).json({
                 message : 'Only employer can create jobs'
             });
         }
         
-        let job = new Job(_.pick(req.body,['title', 'employer', 'numberOfPeople', 'description']))
-        
+        let job = new Job(_.pick(req.body,['title', 'numberOfPeople', 'description']))
+        job.employer = employerId;
         if(req.body.location){
             job.location = req.body.location
         }
@@ -60,9 +60,7 @@ const createJob = async function(req,res,next) {
             });
         }));
         
-        res.status(200).json({
-            message: "Job created"
-        })
+        res.status(200).json({_id: job._id})
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
