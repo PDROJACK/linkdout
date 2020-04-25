@@ -35,6 +35,10 @@ var JobSchema = new Schema({
     requirment: {
         type: Boolean,
         default: false
+    },
+    images: {
+        type: [String],
+        default: []
     }
 },{ timestamps: true });
 

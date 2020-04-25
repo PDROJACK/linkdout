@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var jobController = require('../controllers/jobController');
-
+var {upload} = require('../middlewares/imageUpload');
 
 /* GET single job */
 router.get('/:jobId', jobController.getJob);
@@ -20,7 +20,7 @@ router.get('/', jobController.getAllJobs);
 //   }
 //
 //
-router.post('/createJob', jobController.createJob);
+router.post('/createJob', upload.array('images',8), jobController.createJob);
 
 /*Apply for a job */
 // 

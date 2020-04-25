@@ -53,9 +53,7 @@ UserSchema.methods.validPassword = function(password){
 
 UserSchema.methods.generateJWT = function(){
     return jwt.sign({
-        _id: this._id, 
-        daycare_code: this.daycare_code,
-        mobile: this.mobile 
+        _id: this._id
     }, 
     process.env.SECRET,
     {

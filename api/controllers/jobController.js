@@ -1,6 +1,7 @@
 var User = require('../models/userModel');
 var _ = require('lodash');
 const Job = require('../models/jobsModel');
+const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 
 const getJob = async function(req,res,next){
     try {
@@ -22,16 +23,43 @@ const getJob = async function(req,res,next){
 const createJob = async function(req,res,next) {
     try {
         const employerId = req.body.employer;
-        const user = await User.findById(employerId);
-        if(!user || !user.isEmployer){
+        const user = await User.findById({_id:employerId});
+        
+        if(!user || user.isEmployer === false){
             return res.status(401).json({
                 message : 'Only employer can create jobs'
             });
         }
         
-        const job = new Job(_.pick(req.body,['title', 'employer', 'location', 'numberOfPeople', 'description']))
+        let job = new Job(_.pick(req.body,['title', 'employer', 'numberOfPeople', 'description']))
         
-        await job.save();
+        if(req.body.location){
+            job.location = req.body.location
+        }
+
+
+        if(req.files){
+            let images=[]
+            if(req.files.length>0){
+                req.files.forEach(file => {
+                    images.push(file.path)
+                });
+            }
+            job.images = images
+        }
+
+        const users = await User.find({isEmployer: false});
+        
+        job = await job.save();
+
+        Promise.all(users.map(async (user)=>{
+            await twilio.messages.create({
+                body: `Hey ${user.username}, a job is for you is available Job Id is ${job._id}`,
+                from: process.env.PHONE,
+                to: user.phone
+            });
+        }));
+        
         res.status(200).json({
             message: "Job created"
         })
