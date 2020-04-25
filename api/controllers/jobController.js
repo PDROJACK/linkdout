@@ -103,7 +103,7 @@ const applyJob = async function(req,res,next){
 
         await Job.updateOne({_id: jobId}, {
             $addToSet: {
-                employees: userId
+                employees: userId,
             }
         });
 
