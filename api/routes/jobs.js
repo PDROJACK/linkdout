@@ -32,10 +32,9 @@ router.post(
 //
 // {
 //	"jobId":"5ea35ef3c58a5f4054a6ec0c",
-//  "userId":"5ea337cecab858691060aa45",
 // }
 //
 //
-router.patch("/apply", jobController.applyJob);
+router.patch("/:jobId/apply", auth, jobController.applyJob);
 
 module.exports = router;

@@ -9,6 +9,7 @@ const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
         const job = await Job.findById(jobId).select('title location numberOfPeople description employer employees budget');
+        const application = await Application.find({job:jobId});
 
         if(!job){
             return res.status(400).json({
@@ -16,7 +17,7 @@ const getJob = async function(req,res,next){
             });
         }
 
-        res.status(200).send(job);
+        res.status(200).send({...job._doc, applicants: application});
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -85,8 +86,8 @@ const getAllJobs = async function(req,res,next){
 
 const applyJob = async function(req,res,next){
     try {
-        const userId = req.body.userId;
-        const jobId = req.body.jobId;
+        const userId = req.me._id;
+        const jobId = req.params.jobId;
         const user = await User.findById(userId);
         
         if(user.isEmployer === true){
@@ -117,11 +118,11 @@ const applyJob = async function(req,res,next){
         if(req.body.comment){
             application.comment = comment
         }
-        
+
         await application.save();
 
         res.status(200).send({
-            message: "Successfully applied for job"
+            message: "Successfully applied for job",
         });
     } catch (error) {
         console.log(error);
