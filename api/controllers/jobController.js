@@ -60,7 +60,9 @@ const createJob = async function(req,res,next) {
         const users = await User.find({isEmployer: false});
         
         job.generateCode();
+        
         job = await job.save();
+        
         Promise.all(users.map(async (user)=>{
             await twilio.messages.create({
                 body: `Hey ${user.username}, a job is available for you .Job code is ${job.code}`,
