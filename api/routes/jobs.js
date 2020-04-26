@@ -13,7 +13,7 @@ router.get("/:jobId",auth, jobController.getJob);
 router.get("/",auth, jobController.getAllJobs);
 
 /* POST for job applications */
-router.post("/application/:application", auth, jobController.applicationMgmt);
+router.post("/application/:applicationId", auth, jobController.applicationMgmt);
 
 /* Post a job */
 router.post(

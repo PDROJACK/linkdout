@@ -17,11 +17,7 @@ const getJob = async function(req,res,next){
         }
 
         const user = await User.findById(req.me._id);
-        
-        if(user.isEmployer===false){
-            return res.status(200).send(job);
-        }
-        
+
         res.status(200).send({...job._doc, applicants: application});
        
     } catch (error) {
@@ -140,14 +136,17 @@ const applyJob = async function(req,res,next){
 
 const applicationMgmt = async function(req,res){
     try {
+        console.info(req.body)
         const applicationId = req.params.applicationId;
         const status = req.body.status;
-
-        await Application.updateOne({_id:applicationId},{
+        
+        console.info(applicationId);
+        const update = await Application.updateOne({_id:applicationId},{
             $set:{
                 status: status
             }
         });
+        // console.info(update);
 
         res.status(200).json({
             message: "Application status updated"
