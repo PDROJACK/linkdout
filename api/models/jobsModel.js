@@ -43,9 +43,14 @@ var JobSchema = new Schema({
     budget: {
         type: Number,
         required: true
+    },
+    code: {
+        type: Number
     }
 },{ timestamps: true });
 
-
+JobSchema.methods.generateCode = function(){
+    this.code = Math.floor(Math.random()*9000) + 1000;
+}
 module.exports=mongoose.model('Jobs', JobSchema);
 

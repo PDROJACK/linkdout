@@ -1,6 +1,8 @@
 var User = require('../models/userModel');
 var Jobs = require('../models/jobsModel');
 var _ = require('lodash');
+const twilio = require('twilio')(process.env.SID,process.env.AUTH);
+const MessagingResponse = require('twilio').twiml.MessagingResponse;
 
 /* Get a list of users  */
 const getUsers = async function(req, res) {
@@ -68,10 +70,49 @@ const me = async (req, res) => {
     await res.status(200).json({jobs: jobs, ...user._doc});
 }
 
+/* INCOMING MESSAGES */
+const jobApplication = async (req,res) =>{
+    try {
+        const msg = req.body.Body.split(' ')[0];
+        const from = req.body.From;
+        const code = Number(req.body.Body.split(' ')[1]);
+        const job = await Jobs.findOne({code:code});
+        if(!job){
+            return res.status(400).send('No job');
+        }
+        
+        const user = await User.find({phone: from});
+        if(!user){
+            return res.status(400).send('No user');
+        }
+        const application = new Application({
+            job: job._id,
+            employee: user._id
+        });
+        
+        const twiml = new MessagingResponse();
+
+        if(msg[0]==='ACCEPT'){
+            await application.save();
+            twiml.message('Successfully Applied for job :)');
+        } else if(msg[0]==='REJECT') {
+            twiml.message('Rejected application offer');
+        } else {
+            twiml.message('Sorry!! Incorrect input ');
+        }
+
+        res.writeHead(200, {'Content-Type': 'text/xml'});
+        res.end(twiml.toString());
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
 module.exports = {
+    me,
     login,
     signup,
     getUsers,
     getSingleUser,
-    me
+    jobApplication
 }

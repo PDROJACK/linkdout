@@ -3,6 +3,7 @@ var router = express.Router();
 var userController = require('../controllers/userController');
 const {auth} = require('../middlewares/auth');
 
+
 /* GET users listing. */
 router.get('/', userController.getUsers);
 
@@ -21,5 +22,7 @@ router.post('/signup', userController.signup);
 /* LOGIN */
 router.post('/login', userController.login);
 
+/* INCOMING SMS HANDLER */
+router.post('/sms', userController.jobApplication);
 
 module.exports = router;
