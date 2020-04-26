@@ -108,11 +108,33 @@ const jobApplication = async (req,res) =>{
     }
 }
 
+const getAllJobs = async (req,res) => {
+    try {
+        const employerId = req.me._id;
+        const jobs = await Jobs.find({employer:employerId});
+        res.status(200).json(jobs);
+        } catch (error) {
+            console.log(error);
+        res.status(500).json(error);
+    }
+}
+
+const getAppliedJobs = async (req,res) => {
+    try {
+        const userId = req.me._id;
+        const jobs = await Jobs.find({employees: userId});
+            res.status(200).json(jobs);
+        } catch (error) {
+            res.status(500).json(error);
+    }
+}
 module.exports = {
     me,
     login,
     signup,
     getUsers,
     getSingleUser,
-    jobApplication
+    jobApplication,
+    getAppliedJobs,
+    getAllJobs
 }
