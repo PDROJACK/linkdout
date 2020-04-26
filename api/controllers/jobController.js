@@ -136,7 +136,6 @@ const applyJob = async function(req,res,next){
 
 const applicationMgmt = async function(req,res){
     try {
-        console.info(req.body)
         const applicationId = req.params.applicationId;
         const status = req.body.status;
 

@@ -15,6 +15,7 @@ router.get("/",auth, jobController.getAllJobs);
 /* POST for job applications */
 router.post("/application/:applicationId", auth, jobController.applicationMgmt);
 
+
 /* Post a job */
 router.post(
   "/createJob",
@@ -28,5 +29,7 @@ router.post(
 //
 //
 router.patch("/:jobId/apply", auth, jobController.applyJob);
+
+
 
 module.exports = router;
