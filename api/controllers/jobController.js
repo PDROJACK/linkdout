@@ -117,14 +117,13 @@ const applyJob = async function(req,res,next){
         });
         
         if(req.body.comment){
-            application.comment = comment
+            application.comment = req.body.comment
         }
 
         await application.save();
 
-        res.status(200).send({
-            message: "Successfully applied for job",
-        });
+        res.status(200).send({_id: jobId, message: "Successfully applied for job",});
+
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
