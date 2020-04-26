@@ -4,23 +4,18 @@ var jobController = require("../controllers/jobController");
 var { upload } = require("../middlewares/imageUpload");
 const { auth } = require("../middlewares/auth");
 
+
 /* GET single job */
-router.get("/:jobId", jobController.getJob);
+router.get("/:jobId",auth, jobController.getJob);
+
 
 /* Get all jobs listings*/
-router.get("/", jobController.getAllJobs);
+router.get("/",auth, jobController.getAllJobs);
+
+/* POST for job applications */
+router.post("/application/:application", auth, jobController.applicationMgmt);
 
 /* Post a job */
-//
-// {
-//	"title":"Need some help with my land",
-//	"employer":"5ea33f2bef8dad2e2859d906",
-//	"location":[24, 40],
-//	"numberOfPeople": 4,
-//	"description": "Job to cultivate my land"
-//   }
-//
-//
 router.post(
   "/createJob",
   auth,
@@ -30,9 +25,6 @@ router.post(
 
 /*Apply for a job */
 //
-// {
-
-// }
 //
 //
 router.patch("/:jobId/apply", auth, jobController.applyJob);

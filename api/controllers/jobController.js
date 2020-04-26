@@ -2,7 +2,6 @@ var User = require('../models/userModel');
 var _ = require('lodash');
 const Job = require('../models/jobsModel');
 const Application = require('../models/applicationModel');
-
 const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 
 const getJob = async function(req,res,next){
@@ -17,7 +16,14 @@ const getJob = async function(req,res,next){
             });
         }
 
+        const user = await User.findById(req.me._id);
+        
+        if(user.isEmployer===false){
+            return res.status(200).send(job);
+        }
+        
         res.status(200).send({...job._doc, applicants: application});
+       
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -131,9 +137,29 @@ const applyJob = async function(req,res,next){
     }
 }
 
+const applicationMgmt = async function(req,res){
+    try {
+        const applicationId = req.params.applicationId;
+        const status = req.body.status;
+
+        await Application.updateOne({_id:applicationId},{
+            $set:{
+                status: status
+            }
+        });
+
+        res.status(200).json({
+            message: "Application status updated"
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
 module.exports = {
     getJob,
     createJob,
     getAllJobs,
-    applyJob
+    applyJob,
+    applicationMgmt
 }
