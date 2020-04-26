@@ -7,7 +7,7 @@ const twilio = require('twilio')(process.env.SID,process.env.AUTH);
 const getJob = async function(req,res,next){
     try {
         const jobId = req.params.jobId;
-        const job = await Job.findById(jobId).select('title location numberOfPeople description employer employees budget');
+        const job = await Job.findById(jobId).select('title location numberOfPeople budget description employer employees budget');
         const application = await Application.find({job:jobId});
 
         if(!job){
@@ -61,7 +61,7 @@ const createJob = async function(req,res,next) {
         
         Promise.all(users.map(async (user)=>{
             await twilio.messages.create({
-                body: `Hey ${user.username}, a job is available for you .Job code is ${job.code}`,
+                body: `Hey ${user.username}, a job is available for you - ${job.title}. Job code is ${job.code}, reply with ACCEPT to apply.`,
                 from: process.env.PHONE,
                 to: user.phone
             });
@@ -76,7 +76,7 @@ const createJob = async function(req,res,next) {
 
 const getAllJobs = async function(req,res,next){
     try {
-        const jobs = await Job.find().select('title location description');
+        const jobs = await Job.find().select('title location description budget employees');
         if(jobs.length===0){
             return res.status(400).json({
                 message: "No job at the moment"
@@ -139,7 +139,7 @@ const applicationMgmt = async function(req,res){
         console.info(req.body)
         const applicationId = req.params.applicationId;
         const status = req.body.status;
-        
+
         console.info(applicationId);
         const update = await Application.updateOne({_id:applicationId},{
             $set:{

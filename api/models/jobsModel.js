@@ -42,7 +42,8 @@ var JobSchema = new Schema({
     },
     budget: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     },
     code: {
         type: Number

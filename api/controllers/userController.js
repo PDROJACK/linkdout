@@ -64,7 +64,7 @@ const login = async function(req,res){
 
 /** current the current user */
 const me = async (req, res) => {
-    const user = await User.findById(req.me._id).select('username email isEmployer');
+    const user = await User.findById(req.me._id).select('username email isEmployer createdAt');
     const jobs = await Jobs.find({employer: req.me._id});
 
     await res.status(200).json({jobs: jobs, ...user._doc});
