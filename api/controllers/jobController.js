@@ -88,6 +88,7 @@ const applyJob = async function(req,res,next){
     try {
         const userId = req.me._id;
         const jobId = req.params.jobId;
+
         const user = await User.findById(userId);
         
         if(user.isEmployer === true){

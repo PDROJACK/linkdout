@@ -31,7 +31,7 @@ router.post(
 /*Apply for a job */
 //
 // {
-//	"jobId":"5ea35ef3c58a5f4054a6ec0c",
+
 // }
 //
 //
